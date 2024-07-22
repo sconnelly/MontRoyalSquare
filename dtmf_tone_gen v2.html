@@ -18,6 +18,8 @@
 </head>
 <body>
     <h1>DTMF Tone Generator</h1>
+    <!-- Initialize Audio Context Button -->
+    <button id="init-audio" class="button" onclick="initAudioContext()">Initialize Audio</button><br>
     <div id="dialpad">
         <!-- Unlock button added above the numbered buttons -->
         <button id="unlock-button" class="button" onclick="unlock()">Unlock</button><br>
@@ -36,8 +38,15 @@
     </div>
 
     <script>
-        // Initialize AudioContext
         let audioContext;
+
+        // Function to initialize AudioContext
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                document.getElementById('init-audio').style.display = 'none';
+            }
+        }
 
         // Define DTMF frequencies for each key
         const frequencies = {
@@ -57,6 +66,8 @@
 
         // Function to play the DTMF tone for a given key
         function playTone(key, duration = 500) {
+            if (!audioContext) return;
+
             const freqs = frequencies[key];
             if (!freqs) return;
 
@@ -90,14 +101,17 @@
 
         // Event listener to resume AudioContext on user interaction
         document.body.addEventListener('touchstart', () => {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
             }
-            if (audioContext.state === 'suspended') {
+        });
+
+        // Event listener to resume AudioContext on user interaction
+        document.body.addEventListener('click', () => {
+            if (audioContext && audioContext.state === 'suspended') {
                 audioContext.resume();
             }
         });
     </script>
 </body>
 </html>
-

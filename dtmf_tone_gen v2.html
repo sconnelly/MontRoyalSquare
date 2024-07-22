@@ -17,7 +17,7 @@
     </style>
 </head>
 <body>
-    <h1>DTMF Tone Generator v2.5</h1>
+    <h1>DTMF Tone Generator v2.6</h1>
     <!-- Initialize Audio Context Button -->
     <button id="init-audio" class="button" onclick="initAudioContext()">Initialize Audio</button><br>
     <div id="dialpad">
@@ -100,18 +100,16 @@
         }
 
         // Event listener to resume AudioContext on user interaction
-        document.body.addEventListener('touchstart', () => {
-            if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-        });
+        document.body.addEventListener('touchstart', resumeAudioContext);
+        document.body.addEventListener('click', resumeAudioContext);
 
-        // Event listener to resume AudioContext on user interaction
-        document.body.addEventListener('click', () => {
+        // Function to resume AudioContext
+        function resumeAudioContext() {
             if (audioContext && audioContext.state === 'suspended') {
                 audioContext.resume();
             }
-        });
+        }
     </script>
 </body>
 </html>
+

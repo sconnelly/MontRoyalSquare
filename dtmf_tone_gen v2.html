@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DTMF Tone Generator</title>
+    <style>
+        .button {
+            font-size: 24px;
+            padding: 10px;
+            margin: 5px;
+            width: 60px;
+        }
+        #unlock-button {
+            width: 200px; /* Set width to 200 pixels */
+            margin: 5px; /* Adjust margin for consistent spacing */
+        }
+    </style>
+</head>
+<body>
+    <h1>DTMF Tone Generator</h1>
+    <div id="dialpad">
+        <!-- Unlock button added above the numbered buttons -->
+        <button id="unlock-button" class="button" onclick="unlock()">Unlock</button><br>
+        <button class="button" onclick="playTone('1')">1</button>
+        <button class="button" onclick="playTone('2')">2</button>
+        <button class="button" onclick="playTone('3')">3</button><br>
+        <button class="button" onclick="playTone('4')">4</button>
+        <button class="button" onclick="playTone('5')">5</button>
+        <button class="button" onclick="playTone('6')">6</button><br>
+        <button class="button" onclick="playTone('7')">7</button>
+        <button class="button" onclick="playTone('8')">8</button>
+        <button class="button" onclick="playTone('9')">9</button><br>
+        <button class="button" onclick="playTone('*')">*</button>
+        <button class="button" onclick="playTone('0')">0</button>
+        <button class="button" onclick="playTone('#')">#</button>
+    </div>
+
+    <script>
+        // Initialize AudioContext
+        let audioContext;
+
+        // Define DTMF frequencies for each key
+        const frequencies = {
+            '1': [697, 1209],
+            '2': [697, 1336],
+            '3': [697, 1477],
+            '4': [770, 1209],
+            '5': [770, 1336],
+            '6': [770, 1477],
+            '7': [852, 1209],
+            '8': [852, 1336],
+            '9': [852, 1477],
+            '*': [941, 1209],
+            '0': [941, 1336],
+            '#': [941, 1477]
+        };
+
+        // Function to play the DTMF tone for a given key
+        function playTone(key, duration = 500) {
+            const freqs = frequencies[key];
+            if (!freqs) return;
+
+            // Create and configure oscillators for the dual-tone
+            const osc1 = audioContext.createOscillator();
+            const osc2 = audioContext.createOscillator();
+            osc1.frequency.value = freqs[0];
+            osc2.frequency.value = freqs[1];
+
+            const gainNode = audioContext.createGain(); // Create a gain node to control the volume
+
+            // Connect oscillators to gain node and then to the destination (speakers)
+            osc1.connect(gainNode);
+            osc2.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            osc1.start();
+            osc2.start();
+
+            // Stop the oscillators after the specified duration
+            setTimeout(() => {
+                osc1.stop();
+                osc2.stop();
+            }, duration);
+        }
+
+        // Function to simulate pressing the '9' button for 1 second
+        function unlock() {
+            playTone('9', 1000);
+        }
+
+        // Event listener to resume AudioContext on user interaction
+        document.body.addEventListener('touchstart', () => {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        });
+    </script>
+</body>
+</html>
+
